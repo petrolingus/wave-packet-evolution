@@ -26,7 +26,7 @@ public class Service extends javafx.concurrent.Service<Void> {
             @Override
             protected Void call() throws Exception {
 
-                MathLogic mathLogic = new MathLogic(points);
+                MathLogic mathLogic = new MathLogic();
                 mathLogic.initWavePacket(0, Math.sqrt(0.15));
 
                 int iteration = 0;
