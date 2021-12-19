@@ -10,11 +10,7 @@ import java.util.Random;
 
 public class Service extends javafx.concurrent.Service<Void> {
 
-    private int points = 1024;
-
     private  LineChart<Number, Number> wavePacketChart;
-
-    // private MathLogic mathLogic;
 
     public Service(LineChart<Number, Number> wavePacketChart) {
         this.wavePacketChart = wavePacketChart;
@@ -27,7 +23,8 @@ public class Service extends javafx.concurrent.Service<Void> {
             protected Void call() throws Exception {
 
                 MathLogic mathLogic = new MathLogic();
-                mathLogic.initWavePacket(0, Math.sqrt(0.15));
+                mathLogic.setInitState(0, Math.sqrt(0.15));
+                System.out.println("MathLogic was created");
 
                 int iteration = 0;
                 int clock = 1;
@@ -35,13 +32,18 @@ public class Service extends javafx.concurrent.Service<Void> {
                 while (!isCancelled()) {
 
                     if (iteration++ > clock) {
+                        XYChart.Series<Number, Number> series = mathLogic.getSeries();
                         iteration = 0;
                         Platform.runLater(() -> {
                             wavePacketChart.getData().clear();
-                            wavePacketChart.getData().add(mathLogic.wavePacketSeries);
+                            wavePacketChart.getData().add(series);
                         });
+                        mathLogic.isUsing = false;
                     }
-                    Thread.yield();
+
+                    mathLogic.step();
+                    Thread.sleep(10);
+//                    Thread.yield();
                 }
 
                 return null;

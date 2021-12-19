@@ -18,18 +18,15 @@ public class Controller {
     public void initialize() {
 
         // Random initialization
-        Random random = new Random();
         XYChart.Series<Number, Number> series = new XYChart.Series<>();
         for (int i = 0; i < 1024; i++) {
-            series.getData().add(new XYChart.Data<>(i, random.nextGaussian()));
+            series.getData().add(new XYChart.Data<>(i, 0));
         }
         wavePacketChart.getData().add(series);
 
         // Gaussian initialization
 
         service = new Service(wavePacketChart);
-
-
 
     }
 
