@@ -10,11 +10,18 @@ import java.util.List;
 
 public class MathLogic {
 
-    private static final double R = 3; // Максимальное значение по оси Х для волнового пакета
+    private static final int MODEL_SIZE = 6;
+    private static final double R = MODEL_SIZE / 2.0; // Максимальное значение по оси Х для волнового пакета
     private static final double TAU = 3; // Временной шаг симуляции
     private static final int POINTS = 1024; // Временной шаг симуляции
+    private static final double STEP = MODEL_SIZE / (POINTS - 1.0);
 
-    private double step;
+    private static final double U0 = 30.0;
+    private static final double A = 2.1;
+    private static final double B = 2.5;
+    private static final double K = 0.5;
+    private static final double GAMMA = 1.0;
+    private static final double INF = 50;
 
     /** Потенциал задачи.*/
     private List<Complex> vec_U;
@@ -57,8 +64,6 @@ public class MathLogic {
     XYChart.Series<Number, Number> wavePacketSeries;
 
     public MathLogic() {
-        this.step = (2 * R) / (POINTS - 1);
-
         vectorA = new ArrayList<>(POINTS);
         vectorB = new ArrayList<>(POINTS);
         vectorC = new ArrayList<>(POINTS);
@@ -172,10 +177,75 @@ public class MathLogic {
 //                , Beckon(50)
     }
 
+    /** Проинициализировать состояние волнового пакета.*/
+//    void set_init_state(double mean, double disp)
+//    {
+//        for (size_t i = 0; i < vec_wave_packet_prev.size(); i++)
+//        {
+//            double coord = (double)i / vec_wave_packet_prev.size() * model_size - model_size / 2.;
+//            vec_wave_packet_prev[i] = exp(-(coord - mean) * (coord - mean) / 4.0 / disp / disp);
+//        }
+//        calculate_U();
+//        calculate_SIGM();
+//    }
+    public void setInitState(double mean, double sigma) {
+        Gaussian gaussian = new Gaussian(mean, sigma);
+        for (int i = 0; i < POINTS; i++) {
+             double x = i * STEP - R;
+             vec_wave_packet_prev.add(Complex.valueOf(gaussian.value(x)));
+
+             if (Math.abs(x) < A) {
+                if (x <= 0) {
+                    vec_U.add(Complex.valueOf(INF));
+                } else {
+                    vec_U.add(Complex.valueOf(K * x));
+                }
+             } else {
+                 vec_U.add(Complex.valueOf(0));
+             }
+
+             Complex div = Complex.I;
+
+             if (x < -b) {
+
+             } else if (x <= b) {
+                 vec_sigm.add(Complex.ONE);
+                 vec_d_sigm.add(Complex.ZERO);
+             } else {
+
+             }
+
+
+        }
+
+//        for (size_t i = 0; i < vec_sigm.size(); i++)
+//        {
+//            double coord = (double)i / vec_wave_packet_prev.size() * model_size - model_size / 2.;
+//
+//            if (coord < -b)
+//            {
+//                auto div = (1.0 + image_j * gamma * (coord + b) * (coord + b));
+//                vec_sigm[i] = 1.0 / div;
+//                vec_d_sigm[i] = -2.0 * image_j *gamma * (coord + b) / div / div;
+//            }
+//            else if (coord >= -b && coord <= b)
+//            {
+//                vec_sigm[i] = 1.0;
+//                vec_d_sigm[i] = 0;
+//            }
+//            else if (coord > b)
+//            {
+//                auto div = (1.0 + image_j * gamma * (coord - b) * (coord - b));
+//                vec_sigm[i] = 1.0 / div;
+//                vec_d_sigm[i] = -2.0 * image_j *gamma * (coord - b) / div / div;
+//            }
+//        }
+    }
+
     public void initWavePacket(double mean, double sigma) {
         Gaussian gaussian = new Gaussian(mean, sigma);
         for (int i = 0; i < POINTS; i++) {
-            double x = -R + step * i;
+            double x = -R + STEP * i;
             wavePacketSeries.getData().add(new XYChart.Data<>(x, gaussian.value(x)));
         }
     }
