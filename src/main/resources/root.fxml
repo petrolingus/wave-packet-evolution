@@ -44,7 +44,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="720.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="me.petrolingus.wpe.Controller">
+<VBox prefHeight="720.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="me.petrolingus.wpe.Controller">
   <children>
     <MenuBar VBox.vgrow="NEVER">
       <menus>
@@ -103,7 +103,7 @@
                       <NumberAxis animated="false" side="BOTTOM" />
                     </xAxis>
                     <yAxis>
-                      <NumberAxis animated="false" side="LEFT" upperBound="10.0" />
+                      <NumberAxis animated="false" minorTickCount="2" side="LEFT" tickUnit="0.1" upperBound="1.5" />
                     </yAxis>
                   </LineChart>
                </children>

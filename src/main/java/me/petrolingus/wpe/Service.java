@@ -42,8 +42,8 @@ public class Service extends javafx.concurrent.Service<Void> {
                     }
 
                     mathLogic.step();
-                    Thread.sleep(10);
-//                    Thread.yield();
+                    Thread.yield();
+//                    Thread.sleep(100);
                 }
 
                 return null;
