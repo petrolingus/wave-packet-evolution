@@ -142,18 +142,18 @@ public class MathLogic {
             xis.add(x);
             wavePacketSeries.getData().add(new XYChart.Data<>(x, value));
 
-            if (x < A && x > -A) {
-                if (x <= 0) {
-                    vec_U.add(Complex.valueOf(INF));
-                } else {
-                    vec_U.add(Complex.valueOf(K * x));
-                }
-            } else {
-                vec_U.add(Complex.valueOf(0));
-            }
+//            if (x < A && x > -A) {
+//                if (x <= 0) {
+//                    vec_U.add(Complex.valueOf(INF));
+//                } else {
+//                    vec_U.add(Complex.valueOf(K * x));
+//                }
+//            } else {
+//                vec_U.add(Complex.valueOf(0));
+//            }
 
-//            double u = K * Math.pow(x, 2) / 2;
-//            vec_U.add(Complex.valueOf(u));
+            double u = K * Math.pow(x, 2) / 2;
+            vec_U.add(Complex.valueOf(u));
 
             if (x < -B) {
                 Complex div = Complex.ONE.add(Complex.I.multiply(GAMMA * Math.pow(x + B, 2)));
