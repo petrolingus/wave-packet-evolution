@@ -1,14 +1,9 @@
 package me.petrolingus.wpe;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.chart.LineChart;
-import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.Slider;
-
-import java.util.Random;
 
 public class Controller {
 
@@ -16,7 +11,7 @@ public class Controller {
     public Button stopButton;
 
     public Slider sliderWavePacket;
-    public Slider sliderStationary;
+    public Slider sliderPsi;
 
     public LineChart<Number, Number> wavePacketChart;
     public LineChart<Number, Number> psiChart;
@@ -24,50 +19,34 @@ public class Controller {
 
     private Service service;
 
-    public static XYChart.Series<Number, Number> series = new XYChart.Series<>();
-
-    public static double linePos = 0;
-    public static int lineIndex = 250;
-    public static boolean lineChanged = false;
-
-    public static int stationaryIndex = 0;
-
     public void initialize() {
 
-        // Random initialization
-        XYChart.Series<Number, Number> series = new XYChart.Series<>();
-        XYChart.Series<Number, Number> series2 = new XYChart.Series<>();
-        XYChart.Series<Number, Number> series3 = new XYChart.Series<>();
-        for (int i = 0; i < 1024; i++) {
-            series.getData().add(new XYChart.Data<>(i, 0));
-            series2.getData().add(new XYChart.Data<>(i, 0));
-            series3.getData().add(new XYChart.Data<>(i, 0));
-        }
-        wavePacketChart.getData().add(series);
-        psiChart.getData().add(series2);
-        stationaryChart.getData().add(series2);
+        service = new Service();
 
-        stopButton.setDisable(false);
+        MathLogic.init();
 
         sliderWavePacket.valueProperty().addListener((observable, oldValue, newValue) -> {
-            double upper = ((NumberAxis)wavePacketChart.getXAxis()).getUpperBound();
-            double value = newValue.doubleValue();
-            linePos = upper * value;
-            lineIndex = (int) (Math.round(512 * (value + 1) / 2));
-            lineChanged = true;
+            MathLogic.wavePacketLineSeries.getData().clear();
+            MathLogic.wavePacketLineSeries.getData().add(new XYChart.Data<>(newValue, 0));
+            MathLogic.wavePacketLineSeries.getData().add(new XYChart.Data<>(newValue, 1));
+            MathLogic.wavePacketLineIndex = (int) Math.round(499 * (newValue.doubleValue() + 3) / 6.0);
         });
 
-        sliderStationary.valueProperty().addListener((observable, oldValue, newValue) -> {
-//            double upper = ((NumberAxis)psiChart.getXAxis()).getUpperBound();
-//            double value = newValue.doubleValue();
-//            linePos = upper * value;
-//            lineIndex = (int) (Math.round(500 * (value + 1) / 2));
-//            lineChanged = true;
-            stationaryIndex = (int) Math.round(512 * newValue.doubleValue());
+        wavePacketChart.getData().add(MathLogic.wavePacketLineSeries);
+        wavePacketChart.getData().add(MathLogic.wavePacketSeriesOrigin);
+        wavePacketChart.getData().add(MathLogic.wavePacketSeries);
+
+        sliderPsi.valueProperty().addListener((observable, oldValue, newValue) -> {
+            MathLogic.psiLineSeries.getData().clear();
+            MathLogic.psiLineSeries.getData().add(new XYChart.Data<>(newValue, 0));
+            MathLogic.psiLineSeries.getData().add(new XYChart.Data<>(newValue, 200));
+            MathLogic.psiLineIndex = (int) Math.round((MathLogic.WAVE_PACKETS_COUNT - 1) * (newValue.doubleValue() + 3) / 6.0);
         });
 
-        service = new Service(wavePacketChart, psiChart, stationaryChart);
+        psiChart.getData().add(MathLogic.psiLineSeries);
+        psiChart.getData().add(MathLogic.psiSeries);
 
+        stationaryChart.getData().add(MathLogic.stationarySeries);
     }
 
     public void onStartButton() {

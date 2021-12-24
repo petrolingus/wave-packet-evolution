@@ -1,5 +1,6 @@
 package me.petrolingus.wpe;
 
+import javafx.application.Platform;
 import javafx.scene.chart.XYChart;
 import org.apache.commons.math3.analysis.function.Gaussian;
 import org.apache.commons.math3.complex.Complex;
@@ -8,7 +9,6 @@ import org.apache.commons.math3.transform.FastFourierTransformer;
 import org.apache.commons.math3.transform.TransformType;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -16,19 +16,19 @@ public class MathLogic {
 
     private static final double R = 3;
     private static final double MODEL_SIZE = 2.0 * R;
-    private static final double TAU = 0.01;
-    private static final int POINTS = 500;
-    private static final int POINTS_LESS = POINTS - 1;
+    private static final double TAU = 0.05;
+    public static final int POINTS = 500;
+    public static final int POINTS_LESS = POINTS - 1;
     private static final double STEP = MODEL_SIZE / (POINTS - 1.0);
+    private static final double MEAN = 0.5;
+    private static final double SIGMA = 0.25;
 
-    private static final double U0 = 30.0;
     private static final double A = 2.1;
     private static final double B = 2.5;
     private static final double K = 10;
     private static final double GAMMA = 1.0;
-    private static final double INF = 50;
 
-    private final List<Complex> vec_U;
+    private final List<Complex> vectorU;
     private final List<Complex> vectorSigma;
     private final List<Complex> vectorSigmaDerivative;
 
@@ -45,29 +45,29 @@ public class MathLogic {
 
     private final Complex c0 = Complex.I.multiply(TAU).divide(2.0);
 
-    List<Double> xis;
+    public static final List<Double> XIS = new ArrayList<>(POINTS);
 
-    XYChart.Series<Number, Number> wavePacketSeries;
-    XYChart.Series<Number, Number> wavePacketSeriesOrigin;
-    XYChart.Series<Number, Number> fftSeries;
-    XYChart.Series<Number, Number> stationary;
-    XYChart.Series<Number, Number> fftLine;
+    public final static int WAVE_PACKETS_COUNT = 512;
+    int psiElementsCount = 0;
+    Complex[][] psi = new Complex[WAVE_PACKETS_COUNT][POINTS];
 
-    int counter = 512;
-    int index = 250;
-    List<List<Complex>> psi = new ArrayList<>(counter);
-    int idpsi2 = 0;
-    Complex[][] psi2 = new Complex[counter][POINTS];
+    private static final FastFourierTransformer FFT = new FastFourierTransformer(DftNormalization.STANDARD);
+
+    public static int wavePacketLineIndex = 250;
+    public static final XYChart.Series<Number, Number> wavePacketSeries = new XYChart.Series<>();
+    public static final XYChart.Series<Number, Number> wavePacketSeriesOrigin = new XYChart.Series<>();
+    public static final XYChart.Series<Number, Number> wavePacketLineSeries = new XYChart.Series<>();
+
     boolean isPsiReady = false;
-    boolean psiReady = false;
-    Complex[] result;
-    FastFourierTransformer fft = new FastFourierTransformer(DftNormalization.STANDARD);
+    public static int psiLineIndex = 250;
+    public static final XYChart.Series<Number, Number> psiLineSeries = new XYChart.Series<>();
+    public static final XYChart.Series<Number, Number> psiSeries = new XYChart.Series<>();
 
-    boolean isUsing = false;
+    public static final XYChart.Series<Number, Number> stationarySeries = new XYChart.Series<>();
 
     public MathLogic() {
 
-        vec_U = new ArrayList<>(POINTS);
+        vectorU = new ArrayList<>(POINTS);
         vectorSigma = new ArrayList<>(POINTS);
         vectorSigmaDerivative = new ArrayList<>(POINTS);
 
@@ -91,27 +91,25 @@ public class MathLogic {
             vectorBeta.add(Complex.ZERO);
             vectorWavePacket.add(Complex.ZERO);
         }
-
-        xis = new ArrayList<>(POINTS);
-        wavePacketSeries = new XYChart.Series<>();
-        wavePacketSeriesOrigin = new XYChart.Series<>();
-        fftSeries = new XYChart.Series<>();
     }
 
     public void calculateCoefficient() {
+
         for (int i = 1; i < vectorA.size() - 1; i++) {
             Complex b = vectorSigma.get(i).divide(Math.pow(STEP, 2));
             Complex c = vectorSigmaDerivative.get(i).divide(2.0 * STEP);
             vectorA.set(i, c0.negate().multiply(vectorSigma.get(i)).multiply(b.subtract(c)));
         }
+
         for (int i = 1; i < vectorB.size() - 1; i++) {
             Complex b = vectorSigma.get(i).divide(STEP * STEP);
             Complex c = vectorSigmaDerivative.get(i).divide(2.0 * STEP);
             vectorB.set(i, c0.negate().multiply(vectorSigma.get(i)).multiply(b.add(c)));
         }
+
         for (int i = 1; i < POINTS_LESS; i++) {
             Complex a = vectorSigma.get(i).multiply(vectorSigma.get(i)).multiply(2.0 / Math.pow(STEP, 2));
-            Complex b = vec_U.get(i).add(a);
+            Complex b = vectorU.get(i).add(a);
             Complex c = c0.multiply(b);
             vectorC.set(i, Complex.ONE.add(c));
         }
@@ -120,7 +118,7 @@ public class MathLogic {
             Complex wp = vectorWavePacketPrevious.get(i);
             Complex wpn = vectorWavePacketPrevious.get(i + 1);
             Complex wpp = vectorWavePacketPrevious.get(i - 1);
-            Complex b = vec_U.get(i).negate().multiply(wp);
+            Complex b = vectorU.get(i).negate().multiply(wp);
             Complex c = vectorSigma.get(i).multiply(vectorSigmaDerivative.get(i)).multiply(wpn.subtract(wpp)).divide(2.0 * STEP);
             Complex d = vectorSigma.get(i).pow(2).multiply(wpn.subtract(wp.multiply(2.0)).add(wpp)).divide(STEP * STEP);
             vectorD.set(i, wp.add(c0.multiply(b)).add(c0.multiply(c)).add(c0.multiply(d)));
@@ -145,99 +143,28 @@ public class MathLogic {
     }
 
     public void step() {
-        if (!isUsing) {
-            calculateCoefficient();
-            forward();
-            backward();
-            Collections.copy(vectorWavePacketPrevious, vectorWavePacket);
-
-            if(idpsi2 < counter) {
-                for (int i = 0; i < vectorWavePacket.size(); i++) {
-                    psi2[idpsi2][i] = vectorWavePacket.get(i);
-                }
-                idpsi2++;
-            }
-
-            if (idpsi2 == counter && !isPsiReady) {
-                psiReady = true;
-                isPsiReady = true;
-                System.out.println("Psi ready to process!!!!");
-
-                for (int i = 0; i < POINTS; i++) {
-                    Complex[] complexes = new Complex[counter];
-                    for (int j = 0; j < counter; j++) {
-                        complexes[j] = psi2[j][i];
-                    }
-                    Complex[] result = fft.transform(complexes, TransformType.FORWARD);
-                    for (int j = 0; j < counter; j++) {
-                        psi2[j][i] = result[j];
-                    }
-                }
-
-                System.out.println("Psi ready to use!!!!");
-            }
-
-//            if (psi.size() < counter) {
-//                List<Complex> complexes = new ArrayList<>(POINTS);
-//                for (int i = 0; i < POINTS; i++) {
-//                    complexes.add(vectorWavePacket.get(i));
-//                }
-//                psi.add(complexes);
-//            } else if (!isPsiReady) {
-//                isPsiReady = true;
-//                psiReady = true;
-//
-//                for (int i = 0; i < 512; i++) {
-//                    Complex[] complexes = new Complex[counter];
-//                    for (int j = 0; j < counter; j++) {
-//                        complexes[j] = psi.get(j).get(i);
-//                    }
-//                    Complex[] r = fft.transform(complexes, TransformType.FORWARD);
-//                    for (int j = 0; j < counter; j++) {
-//                        List<Complex> curr = psi.get()
-//                        psi.set
-//                    }
-//                }
-//            }
-
-//            if (isPsiReady) {
-//                calculate();
-//                stationary.getData().clear();
-//                for (int i = 0; i < 100; i++) {
-//                    double value = 1;
-//                    stationary.getData().add(new XYChart.Data<>(xis.get(i), value));
-//                }
-//            }
-
-        }
+        calculateCoefficient();
+        forward();
+        backward();
+        Collections.copy(vectorWavePacketPrevious, vectorWavePacket);
+        createWavePacket();
+        createPhi();
+        createStationary();
     }
 
-    public void calculate() {
-        Complex[] complexes = new Complex[counter];
-        for (int i = 0; i < counter; i++) {
-            complexes[i] = psi.get(i).get(Controller.lineIndex);
-        }
-        result = fft.transform(complexes, TransformType.FORWARD);
-//        System.out.println(Arrays.toString(complexes));
-//        System.out.println("fft is ready111!");
-    }
+    public void setInitState() {
 
-    public void setInitState(double mean, double sigma) {
-        Gaussian gaussian = new Gaussian(1, mean, sigma);
         for (int i = 0; i < POINTS; i++) {
-            double x = i * STEP - R;
-            double value = gaussian.value(x);
+            double x = XIS.get(i);
+            double value = wavePacketSeriesOrigin.getData().get(i).getYValue().doubleValue();
             vectorWavePacketPrevious.add(Complex.valueOf(value));
-            xis.add(x);
-            wavePacketSeries.getData().add(new XYChart.Data<>(x, value));
-            wavePacketSeriesOrigin.getData().add(new XYChart.Data<>(x, value));
 
             if (x > -A && x < A) {
                 double c0 = K * A * A / 2.0;
                 double u = K * Math.pow(x, 2) / 2.0 - c0;
-                vec_U.add(Complex.valueOf(u));
+                vectorU.add(Complex.valueOf(u));
             } else {
-                vec_U.add(Complex.valueOf(0));
+                vectorU.add(Complex.valueOf(0));
             }
 
             if (x < -B) {
@@ -253,60 +180,91 @@ public class MathLogic {
                 vectorSigmaDerivative.add(Complex.I.divide(div.pow(2)).multiply(-2.0 * GAMMA * (x - B)));
             }
         }
-        System.out.println();
+
     }
 
-    public XYChart.Series<Number, Number> getSeries() {
-        isUsing = true;
-        XYChart.Series<Number, Number> series = new XYChart.Series<>();
+    private void createWavePacket() {
+        Platform.runLater(() -> {
+            wavePacketSeries.getData().clear();
+            for (int i = 0; i < POINTS; i++) {
+                wavePacketSeries.getData().add(new XYChart.Data<>(XIS.get(i), vectorWavePacket.get(i).abs()));
+            }
+        });
+    }
+
+    private void createPhi() {
+        if(psiElementsCount < WAVE_PACKETS_COUNT) {
+            for (int i = 0; i < vectorWavePacket.size(); i++) {
+                psi[psiElementsCount][i] = vectorWavePacket.get(i);
+            }
+            psiElementsCount++;
+        } else if (!isPsiReady) {
+
+            for (int i = 0; i < POINTS; i++) {
+                Complex[] complexes = new Complex[WAVE_PACKETS_COUNT];
+                for (int j = 0; j < WAVE_PACKETS_COUNT; j++) {
+                    complexes[j] = psi[j][i];
+                }
+                Complex[] result = FFT.transform(complexes, TransformType.FORWARD);
+                for (int j = 0; j < WAVE_PACKETS_COUNT; j++) {
+                    psi[j][i] = result[j];
+                }
+            }
+
+            System.out.println("READY!!");
+            isPsiReady = true;
+        }
+    }
+
+    private void createStationary() {
+        if (isPsiReady) {
+            Platform.runLater(() -> {
+                psiSeries.getData().clear();
+                for (int i = 0; i < POINTS; i++) {
+                    psiSeries.getData().add(new XYChart.Data<>(XIS.get(i), psi[i][wavePacketLineIndex].abs()));
+                }
+                stationarySeries.getData().clear();
+                for (int i = 0; i < POINTS; i++) {
+                    stationarySeries.getData().add(new XYChart.Data<>(XIS.get(i), psi[psiLineIndex][i].abs()));
+                }
+            });
+        }
+    }
+
+    public static void init() {
+        initWavePacketSeries();
+        initVerticalLineSeries();
+        initPsiSeries();
+        initStationarySeries();
+    }
+
+    private static void initWavePacketSeries() {
+        Gaussian gaussian = new Gaussian(1, MEAN, SIGMA);
         for (int i = 0; i < POINTS; i++) {
-            double x = xis.get(i);
-            double y = vectorWavePacket.get(i).abs();
-            series.getData().add(new XYChart.Data<>(x, y));
+            double x = i * STEP - R;
+            double value = gaussian.value(x);
+            XIS.add(x);
+            wavePacketSeries.getData().add(new XYChart.Data<>(x, value));
+            wavePacketSeriesOrigin.getData().add(new XYChart.Data<>(x, value));
         }
-        isUsing = false;
-        return series;
     }
 
-    public XYChart.Series<Number, Number> getFftSeries() {
-        isUsing = true;
-        XYChart.Series<Number, Number> series = new XYChart.Series<>();
-        if (psiReady) {
-            for (int i = 0; i < POINTS; i++) {
-                double x = xis.get(i);
-                double y = psi2[i][Controller.lineIndex].abs();
-                series.getData().add(new XYChart.Data<>(x, y));
-            }
-        } else {
-            for (int i = 0; i < POINTS; i++) {
-                double x = xis.get(i);
-                series.getData().add(new XYChart.Data<>(x, 0));
-            }
-        }
-        isUsing = false;
-        return series;
+    private static void initVerticalLineSeries() {
+        wavePacketLineSeries.getData().add(new XYChart.Data<>(0, 0));
+        wavePacketLineSeries.getData().add(new XYChart.Data<>(0, 1));
+        psiLineSeries.getData().add(new XYChart.Data<>(0, 0));
+        psiLineSeries.getData().add(new XYChart.Data<>(0, 200));
     }
 
-    public XYChart.Series<Number, Number> getOrigin() {
-        return wavePacketSeriesOrigin;
+    private static void initPsiSeries() {
+        for (int i = 0; i < POINTS; i++) {
+            psiSeries.getData().add(new XYChart.Data<>(XIS.get(i), 0));
+        }
     }
 
-    public XYChart.Series<Number, Number> getStationary() {
-        isUsing = true;
-        XYChart.Series<Number, Number> series = new XYChart.Series<>();
-        if (psiReady) {
-            for (int i = 0; i < POINTS; i++) {
-                double x = xis.get(i);
-                double y = psi2[Controller.stationaryIndex][i].abs();
-                series.getData().add(new XYChart.Data<>(x, y));
-            }
-        } else {
-            for (int i = 0; i < POINTS; i++) {
-                double x = xis.get(i);
-                series.getData().add(new XYChart.Data<>(x, 0));
-            }
+    private static void initStationarySeries() {
+        for (int i = 0; i < POINTS; i++) {
+            stationarySeries.getData().add(new XYChart.Data<>(XIS.get(i), 0));
         }
-        isUsing = false;
-        return series;
     }
 }
