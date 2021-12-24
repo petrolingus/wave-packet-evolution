@@ -33,7 +33,6 @@
 -->
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.chart.CategoryAxis?>
 <?import javafx.scene.chart.LineChart?>
 <?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.control.Button?>
@@ -47,7 +46,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="720.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="me.petrolingus.wpe.Controller">
+<VBox prefHeight="720.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="me.petrolingus.wpe.Controller">
   <children>
     <MenuBar VBox.vgrow="NEVER">
       <menus>
@@ -93,7 +92,7 @@
             <VBox prefHeight="200.0" prefWidth="200.0" spacing="8.0">
                <children>
                   <Button fx:id="startButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onStartButton" text="Start" />
-                  <Button fx:id="stopButton" disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onStopButton" text="Stop" />
+                  <Button fx:id="stopButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onStopButton" text="Stop" />
                </children>
                <padding>
                   <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
@@ -114,17 +113,32 @@
                         <HBox>
                            <children>
                               <Pane prefWidth="32.0" />
-                              <Slider fx:id="sliderWavePacket" blockIncrement="0.1" disable="true" majorTickUnit="0.1" max="1.0" minorTickCount="1" HBox.hgrow="ALWAYS" />
+                              <Slider fx:id="sliderWavePacket" blockIncrement="0.1" majorTickUnit="0.1" max="1.0" min="-1.0" minorTickCount="1" HBox.hgrow="ALWAYS" />
                               <Pane prefWidth="8.0" />
                            </children>
                         </HBox>
-                        <LineChart>
+                        <LineChart fx:id="psiChart" animated="false" createSymbols="false" legendVisible="false">
                           <xAxis>
-                            <CategoryAxis side="BOTTOM" />
+                            <NumberAxis side="BOTTOM" />
                           </xAxis>
                           <yAxis>
                             <NumberAxis side="LEFT" />
                           </yAxis>
+                        </LineChart>
+                        <HBox>
+                           <children>
+                              <Pane prefWidth="32.0" />
+                              <Slider fx:id="sliderStationary" blockIncrement="0.1" majorTickUnit="0.1" max="1.0" minorTickCount="1" HBox.hgrow="ALWAYS" />
+                              <Pane prefWidth="8.0" />
+                           </children>
+                        </HBox>
+                        <LineChart fx:id="stationaryChart" animated="false" createSymbols="false" legendVisible="false">
+                           <xAxis>
+                              <NumberAxis side="BOTTOM" />
+                           </xAxis>
+                           <yAxis>
+                              <NumberAxis side="LEFT" />
+                           </yAxis>
                         </LineChart>
                      </children>
                   </VBox>

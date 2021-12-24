@@ -3,8 +3,12 @@ package me.petrolingus.wpe;
 import javafx.scene.chart.XYChart;
 import org.apache.commons.math3.analysis.function.Gaussian;
 import org.apache.commons.math3.complex.Complex;
+import org.apache.commons.math3.transform.DftNormalization;
+import org.apache.commons.math3.transform.FastFourierTransformer;
+import org.apache.commons.math3.transform.TransformType;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -20,7 +24,7 @@ public class MathLogic {
     private static final double U0 = 30.0;
     private static final double A = 2.1;
     private static final double B = 2.5;
-    private static final double K = 0.1;
+    private static final double K = 10;
     private static final double GAMMA = 1.0;
     private static final double INF = 50;
 
@@ -44,6 +48,20 @@ public class MathLogic {
     List<Double> xis;
 
     XYChart.Series<Number, Number> wavePacketSeries;
+    XYChart.Series<Number, Number> wavePacketSeriesOrigin;
+    XYChart.Series<Number, Number> fftSeries;
+    XYChart.Series<Number, Number> stationary;
+    XYChart.Series<Number, Number> fftLine;
+
+    int counter = 512;
+    int index = 250;
+    List<List<Complex>> psi = new ArrayList<>(counter);
+    int idpsi2 = 0;
+    Complex[][] psi2 = new Complex[counter][POINTS];
+    boolean isPsiReady = false;
+    boolean psiReady = false;
+    Complex[] result;
+    FastFourierTransformer fft = new FastFourierTransformer(DftNormalization.STANDARD);
 
     boolean isUsing = false;
 
@@ -76,6 +94,8 @@ public class MathLogic {
 
         xis = new ArrayList<>(POINTS);
         wavePacketSeries = new XYChart.Series<>();
+        wavePacketSeriesOrigin = new XYChart.Series<>();
+        fftSeries = new XYChart.Series<>();
     }
 
     public void calculateCoefficient() {
@@ -130,30 +150,95 @@ public class MathLogic {
             forward();
             backward();
             Collections.copy(vectorWavePacketPrevious, vectorWavePacket);
+
+            if(idpsi2 < counter) {
+                for (int i = 0; i < vectorWavePacket.size(); i++) {
+                    psi2[idpsi2][i] = vectorWavePacket.get(i);
+                }
+                idpsi2++;
+            }
+
+            if (idpsi2 == counter && !isPsiReady) {
+                psiReady = true;
+                isPsiReady = true;
+                System.out.println("Psi ready to process!!!!");
+
+                for (int i = 0; i < POINTS; i++) {
+                    Complex[] complexes = new Complex[counter];
+                    for (int j = 0; j < counter; j++) {
+                        complexes[j] = psi2[j][i];
+                    }
+                    Complex[] result = fft.transform(complexes, TransformType.FORWARD);
+                    for (int j = 0; j < counter; j++) {
+                        psi2[j][i] = result[j];
+                    }
+                }
+
+                System.out.println("Psi ready to use!!!!");
+            }
+
+//            if (psi.size() < counter) {
+//                List<Complex> complexes = new ArrayList<>(POINTS);
+//                for (int i = 0; i < POINTS; i++) {
+//                    complexes.add(vectorWavePacket.get(i));
+//                }
+//                psi.add(complexes);
+//            } else if (!isPsiReady) {
+//                isPsiReady = true;
+//                psiReady = true;
+//
+//                for (int i = 0; i < 512; i++) {
+//                    Complex[] complexes = new Complex[counter];
+//                    for (int j = 0; j < counter; j++) {
+//                        complexes[j] = psi.get(j).get(i);
+//                    }
+//                    Complex[] r = fft.transform(complexes, TransformType.FORWARD);
+//                    for (int j = 0; j < counter; j++) {
+//                        List<Complex> curr = psi.get()
+//                        psi.set
+//                    }
+//                }
+//            }
+
+//            if (isPsiReady) {
+//                calculate();
+//                stationary.getData().clear();
+//                for (int i = 0; i < 100; i++) {
+//                    double value = 1;
+//                    stationary.getData().add(new XYChart.Data<>(xis.get(i), value));
+//                }
+//            }
+
         }
     }
 
+    public void calculate() {
+        Complex[] complexes = new Complex[counter];
+        for (int i = 0; i < counter; i++) {
+            complexes[i] = psi.get(i).get(Controller.lineIndex);
+        }
+        result = fft.transform(complexes, TransformType.FORWARD);
+//        System.out.println(Arrays.toString(complexes));
+//        System.out.println("fft is ready111!");
+    }
+
     public void setInitState(double mean, double sigma) {
-        Gaussian gaussian = new Gaussian(mean, sigma);
+        Gaussian gaussian = new Gaussian(1, mean, sigma);
         for (int i = 0; i < POINTS; i++) {
             double x = i * STEP - R;
             double value = gaussian.value(x);
             vectorWavePacketPrevious.add(Complex.valueOf(value));
             xis.add(x);
             wavePacketSeries.getData().add(new XYChart.Data<>(x, value));
+            wavePacketSeriesOrigin.getData().add(new XYChart.Data<>(x, value));
 
-//            if (x < A && x > -A) {
-//                if (x <= 0) {
-//                    vec_U.add(Complex.valueOf(INF));
-//                } else {
-//                    vec_U.add(Complex.valueOf(K * x));
-//                }
-//            } else {
-//                vec_U.add(Complex.valueOf(0));
-//            }
-
-            double u = K * Math.pow(x, 2) / 2;
-            vec_U.add(Complex.valueOf(u));
+            if (x > -A && x < A) {
+                double c0 = K * A * A / 2.0;
+                double u = K * Math.pow(x, 2) / 2.0 - c0;
+                vec_U.add(Complex.valueOf(u));
+            } else {
+                vec_U.add(Complex.valueOf(0));
+            }
 
             if (x < -B) {
                 Complex div = Complex.ONE.add(Complex.I.multiply(GAMMA * Math.pow(x + B, 2)));
@@ -174,17 +259,52 @@ public class MathLogic {
     public XYChart.Series<Number, Number> getSeries() {
         isUsing = true;
         XYChart.Series<Number, Number> series = new XYChart.Series<>();
-//        double max = 0;
-//        for (int i = 0; i < POINTS; i++) {
-//            double value = vectorWavePacket.get(i).abs();
-//            if (max < value) {
-//                max = value;
-//            }
-//        }
         for (int i = 0; i < POINTS; i++) {
             double x = xis.get(i);
             double y = vectorWavePacket.get(i).abs();
             series.getData().add(new XYChart.Data<>(x, y));
+        }
+        isUsing = false;
+        return series;
+    }
+
+    public XYChart.Series<Number, Number> getFftSeries() {
+        isUsing = true;
+        XYChart.Series<Number, Number> series = new XYChart.Series<>();
+        if (psiReady) {
+            for (int i = 0; i < POINTS; i++) {
+                double x = xis.get(i);
+                double y = psi2[i][Controller.lineIndex].abs();
+                series.getData().add(new XYChart.Data<>(x, y));
+            }
+        } else {
+            for (int i = 0; i < POINTS; i++) {
+                double x = xis.get(i);
+                series.getData().add(new XYChart.Data<>(x, 0));
+            }
+        }
+        isUsing = false;
+        return series;
+    }
+
+    public XYChart.Series<Number, Number> getOrigin() {
+        return wavePacketSeriesOrigin;
+    }
+
+    public XYChart.Series<Number, Number> getStationary() {
+        isUsing = true;
+        XYChart.Series<Number, Number> series = new XYChart.Series<>();
+        if (psiReady) {
+            for (int i = 0; i < POINTS; i++) {
+                double x = xis.get(i);
+                double y = psi2[Controller.stationaryIndex][i].abs();
+                series.getData().add(new XYChart.Data<>(x, y));
+            }
+        } else {
+            for (int i = 0; i < POINTS; i++) {
+                double x = xis.get(i);
+                series.getData().add(new XYChart.Data<>(x, 0));
+            }
         }
         isUsing = false;
         return series;
