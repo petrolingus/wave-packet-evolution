@@ -50,11 +50,8 @@
 <?import javafx.scene.layout.VBox?>
 
 <VBox prefHeight="720.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="me.petrolingus.wpe.Controller">
-  <children>
     <MenuBar VBox.vgrow="NEVER">
-      <menus>
         <Menu mnemonicParsing="false" text="File">
-          <items>
             <MenuItem mnemonicParsing="false" text="New" />
             <MenuItem mnemonicParsing="false" text="Open…" />
             <Menu mnemonicParsing="false" text="Open Recent" />
@@ -67,10 +64,8 @@
             <MenuItem mnemonicParsing="false" text="Preferences…" />
             <SeparatorMenuItem mnemonicParsing="false" />
             <MenuItem mnemonicParsing="false" text="Quit" />
-          </items>
         </Menu>
         <Menu mnemonicParsing="false" text="Edit">
-          <items>
             <MenuItem mnemonicParsing="false" text="Undo" />
             <MenuItem mnemonicParsing="false" text="Redo" />
             <SeparatorMenuItem mnemonicParsing="false" />
@@ -81,141 +76,100 @@
             <SeparatorMenuItem mnemonicParsing="false" />
             <MenuItem mnemonicParsing="false" text="Select All" />
             <MenuItem mnemonicParsing="false" text="Unselect All" />
-          </items>
         </Menu>
         <Menu mnemonicParsing="false" text="Help">
-          <items>
             <MenuItem mnemonicParsing="false" text="About MyHelloApp" />
-          </items>
         </Menu>
-      </menus>
     </MenuBar>
-      <HBox VBox.vgrow="ALWAYS">
-         <children>
-            <VBox prefHeight="200.0" prefWidth="200.0" spacing="8.0">
-               <children>
-                  <TitledPane text="Settings">
-                     <content>
-                        <VBox spacing="4.0">
-                           <children>
-                              <HBox>
-                                 <children>
-                                    <Label contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="R" HBox.hgrow="ALWAYS" />
-                                    <TextField maxWidth="64.0" text="3" />
-                                 </children>
-                              </HBox>
-                              <HBox>
-                                 <children>
-                                    <Label contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Tau" HBox.hgrow="ALWAYS" />
-                                    <TextField maxWidth="64.0" text="0.05" />
-                                 </children>
-                              </HBox>
-                              <HBox>
-                                 <children>
-                                    <Label contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Samples" HBox.hgrow="ALWAYS" />
-                                    <TextField maxWidth="64.0" text="500" />
-                                 </children>
-                              </HBox>
-                              <HBox>
-                                 <children>
-                                    <Label contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Mean" HBox.hgrow="ALWAYS" />
-                                    <TextField maxWidth="64.0" text="0.5" />
-                                 </children>
-                              </HBox>
-                              <HBox>
-                                 <children>
-                                    <Label contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Sigma" HBox.hgrow="ALWAYS" />
-                                    <TextField maxWidth="64.0" text="0.25" />
-                                 </children>
-                              </HBox>
-                              <HBox>
-                                 <children>
-                                    <Label contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="A" HBox.hgrow="ALWAYS" />
-                                    <TextField maxWidth="64.0" text="2.1" />
-                                 </children>
-                              </HBox>
-                              <HBox>
-                                 <children>
-                                    <Label contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="B" HBox.hgrow="ALWAYS" />
-                                    <TextField maxWidth="64.0" text="2.5" />
-                                 </children>
-                              </HBox>
-                              <HBox>
-                                 <children>
-                                    <Label contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="K" HBox.hgrow="ALWAYS" />
-                                    <TextField maxWidth="64.0" text="10" />
-                                 </children>
-                              </HBox>
-                              <HBox>
-                                 <children>
-                                    <Label contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Gamma" HBox.hgrow="ALWAYS" />
-                                    <TextField maxWidth="64.0" text="1.0" />
-                                 </children>
-                              </HBox>
-                              <HBox>
-                                 <children>
-                                    <Label contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Series Count" HBox.hgrow="ALWAYS" />
-                                    <TextField maxWidth="64.0" text="512" />
-                                 </children>
-                              </HBox>
-                           </children>
-                        </VBox>
-                     </content>
-                  </TitledPane>
-                  <Button fx:id="startButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onStartButton" text="Start" />
-                  <Button fx:id="stopButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onStopButton" text="Stop" />
-               </children>
-               <padding>
-                  <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
-               </padding>
+    <HBox VBox.vgrow="ALWAYS">
+        <VBox prefHeight="200.0" prefWidth="200.0" spacing="8.0">
+            <padding>
+                <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+            </padding>
+            <TitledPane text="Settings">
+                <VBox spacing="4.0">
+                    <HBox>
+                        <Label contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="R" HBox.hgrow="ALWAYS" />
+                        <TextField maxWidth="64.0" text="3" />
+                    </HBox>
+                    <HBox>
+                        <Label contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Tau" HBox.hgrow="ALWAYS" />
+                        <TextField maxWidth="64.0" text="0.05" />
+                    </HBox>
+                    <HBox>
+                        <Label contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Samples" HBox.hgrow="ALWAYS" />
+                        <TextField maxWidth="64.0" text="500" />
+                    </HBox>
+                    <HBox>
+                        <Label contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Mean" HBox.hgrow="ALWAYS" />
+                        <TextField maxWidth="64.0" text="0.5" />
+                    </HBox>
+                    <HBox>
+                        <Label contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Sigma" HBox.hgrow="ALWAYS" />
+                        <TextField maxWidth="64.0" text="0.25" />
+                    </HBox>
+                    <HBox>
+                        <Label contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="A" HBox.hgrow="ALWAYS" />
+                        <TextField maxWidth="64.0" text="2.1" />
+                    </HBox>
+                    <HBox>
+                        <Label contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="B" HBox.hgrow="ALWAYS" />
+                        <TextField maxWidth="64.0" text="2.5" />
+                    </HBox>
+                    <HBox>
+                        <Label contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="K" HBox.hgrow="ALWAYS" />
+                        <TextField maxWidth="64.0" text="10" />
+                    </HBox>
+                    <HBox>
+                        <Label contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Gamma" HBox.hgrow="ALWAYS" />
+                        <TextField maxWidth="64.0" text="1.0" />
+                    </HBox>
+                    <HBox>
+                        <Label contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Series Count" HBox.hgrow="ALWAYS" />
+                        <TextField maxWidth="64.0" text="512" />
+                    </HBox>
+                </VBox>
+            </TitledPane>
+            <Button fx:id="startButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onStartButton" text="Start" />
+            <Button fx:id="stopButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onStopButton" text="Stop" />
+        </VBox>
+        <AnchorPane HBox.hgrow="ALWAYS">
+            <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                <LineChart fx:id="wavePacketChart" animated="false" createSymbols="false" legendVisible="false">
+                    <xAxis>
+                        <NumberAxis animated="false" autoRanging="false" lowerBound="-3.0" side="BOTTOM" tickUnit="0.5" upperBound="3.0" />
+                    </xAxis>
+                    <yAxis>
+                        <NumberAxis animated="false" autoRanging="false" minorTickCount="2" side="LEFT" tickUnit="0.2" upperBound="1.0" />
+                    </yAxis>
+                </LineChart>
+                <HBox>
+                    <Pane prefWidth="32.0" />
+                    <Slider fx:id="sliderWavePacket" blockIncrement="0.1" majorTickUnit="0.1" max="3.0" min="-3.0" minorTickCount="1" HBox.hgrow="ALWAYS" />
+                    <Pane prefWidth="8.0" />
+                </HBox>
+                <LineChart fx:id="psiChart" animated="false" createSymbols="false" legendVisible="false">
+                    <xAxis>
+                        <NumberAxis animated="false" autoRanging="false" lowerBound="-3.0" side="BOTTOM" tickUnit="0.5" upperBound="3.0" />
+                    </xAxis>
+                    <yAxis>
+                        <NumberAxis animated="false" autoRanging="false" minorTickCount="2" side="LEFT" tickUnit="50.0" upperBound="200.0" />
+                    </yAxis>
+                </LineChart>
+                <HBox>
+                    <Pane prefWidth="32.0" />
+                    <Slider fx:id="sliderPsi" blockIncrement="0.1" majorTickUnit="0.1" max="3.0" min="-3.0" minorTickCount="1" HBox.hgrow="ALWAYS" />
+                    <Pane prefWidth="8.0" />
+                </HBox>
+                <LineChart fx:id="stationaryChart" animated="false" createSymbols="false" legendVisible="false">
+                    <xAxis>
+                        <NumberAxis animated="false" autoRanging="false" lowerBound="-3.0" side="BOTTOM" tickUnit="0.5" upperBound="3.0" />
+                    </xAxis>
+                    <yAxis>
+                        <NumberAxis animated="false" minorTickCount="2" side="LEFT" tickUnit="50.0" upperBound="200.0" />
+                    </yAxis>
+                </LineChart>
             </VBox>
-          <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" HBox.hgrow="ALWAYS">
-               <children>
-                  <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                     <children>
-                        <LineChart fx:id="wavePacketChart" animated="false" createSymbols="false" legendVisible="false">
-                          <xAxis>
-                            <NumberAxis animated="false" autoRanging="false" lowerBound="-3.0" side="BOTTOM" tickUnit="0.5" upperBound="3.0" />
-                          </xAxis>
-                          <yAxis>
-                            <NumberAxis animated="false" autoRanging="false" minorTickCount="2" side="LEFT" tickUnit="0.2" upperBound="1.0" />
-                          </yAxis>
-                        </LineChart>
-                        <HBox>
-                           <children>
-                              <Pane prefWidth="32.0" />
-                              <Slider fx:id="sliderWavePacket" blockIncrement="0.1" majorTickUnit="0.1" max="3.0" min="-3.0" minorTickCount="1" HBox.hgrow="ALWAYS" />
-                              <Pane prefWidth="8.0" />
-                           </children>
-                        </HBox>
-                        <LineChart fx:id="psiChart" animated="false" createSymbols="false" legendVisible="false">
-                          <xAxis>
-                            <NumberAxis animated="false" autoRanging="false" lowerBound="-3.0" side="BOTTOM" tickUnit="0.5" upperBound="3.0" />
-                          </xAxis>
-                          <yAxis>
-                            <NumberAxis animated="false" minorTickCount="2" side="LEFT" tickUnit="50.0" upperBound="200.0" />
-                          </yAxis>
-                        </LineChart>
-                        <HBox>
-                           <children>
-                              <Pane prefWidth="32.0" />
-                              <Slider fx:id="sliderPsi" blockIncrement="0.1" majorTickUnit="0.1" max="3.0" min="-3.0" minorTickCount="1" HBox.hgrow="ALWAYS" />
-                              <Pane prefWidth="8.0" />
-                           </children>
-                        </HBox>
-                        <LineChart fx:id="stationaryChart" animated="false" createSymbols="false" legendVisible="false">
-                           <xAxis>
-                              <NumberAxis animated="false" autoRanging="false" lowerBound="-3.0" side="BOTTOM" tickUnit="0.5" upperBound="3.0" />
-                           </xAxis>
-                           <yAxis>
-                              <NumberAxis animated="false" minorTickCount="2" side="LEFT" tickUnit="50.0" upperBound="200.0" />
-                           </yAxis>
-                        </LineChart>
-                     </children>
-                  </VBox>
-               </children>
-          </AnchorPane>
-         </children>
-      </HBox>
-  </children>
+        </AnchorPane>
+    </HBox>
 </VBox>
