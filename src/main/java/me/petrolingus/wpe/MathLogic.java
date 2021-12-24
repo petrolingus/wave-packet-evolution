@@ -147,9 +147,8 @@ public class MathLogic {
         forward();
         backward();
         Collections.copy(vectorWavePacketPrevious, vectorWavePacket);
-        createWavePacket();
         createPhi();
-        createStationary();
+        createSeriesAndDrawIt();
     }
 
     public void setInitState() {
@@ -183,17 +182,27 @@ public class MathLogic {
 
     }
 
-    private void createWavePacket() {
+    private void createSeriesAndDrawIt() {
         Platform.runLater(() -> {
             wavePacketSeries.getData().clear();
             for (int i = 0; i < POINTS; i++) {
                 wavePacketSeries.getData().add(new XYChart.Data<>(XIS.get(i), vectorWavePacket.get(i).abs()));
             }
+            if (isPsiReady) {
+                psiSeries.getData().clear();
+                for (int i = 0; i < POINTS; i++) {
+                    psiSeries.getData().add(new XYChart.Data<>(XIS.get(i), psi[i][wavePacketLineIndex].abs()));
+                }
+                stationarySeries.getData().clear();
+                for (int i = 0; i < POINTS; i++) {
+                    stationarySeries.getData().add(new XYChart.Data<>(XIS.get(i), psi[psiLineIndex][i].abs()));
+                }
+            }
         });
     }
 
     private void createPhi() {
-        if(psiElementsCount < WAVE_PACKETS_COUNT) {
+        if (psiElementsCount < WAVE_PACKETS_COUNT) {
             for (int i = 0; i < vectorWavePacket.size(); i++) {
                 psi[psiElementsCount][i] = vectorWavePacket.get(i);
             }
@@ -213,21 +222,6 @@ public class MathLogic {
 
             System.out.println("READY!!");
             isPsiReady = true;
-        }
-    }
-
-    private void createStationary() {
-        if (isPsiReady) {
-            Platform.runLater(() -> {
-                psiSeries.getData().clear();
-                for (int i = 0; i < POINTS; i++) {
-                    psiSeries.getData().add(new XYChart.Data<>(XIS.get(i), psi[i][wavePacketLineIndex].abs()));
-                }
-                stationarySeries.getData().clear();
-                for (int i = 0; i < POINTS; i++) {
-                    stationarySeries.getData().add(new XYChart.Data<>(XIS.get(i), psi[psiLineIndex][i].abs()));
-                }
-            });
         }
     }
 
