@@ -36,11 +36,14 @@
 <?import javafx.scene.chart.LineChart?>
 <?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
@@ -91,6 +94,74 @@
          <children>
             <VBox prefHeight="200.0" prefWidth="200.0" spacing="8.0">
                <children>
+                  <TitledPane text="Settings">
+                     <content>
+                        <VBox spacing="4.0">
+                           <children>
+                              <HBox>
+                                 <children>
+                                    <Label contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="R" HBox.hgrow="ALWAYS" />
+                                    <TextField maxWidth="64.0" text="3" />
+                                 </children>
+                              </HBox>
+                              <HBox>
+                                 <children>
+                                    <Label contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Tau" HBox.hgrow="ALWAYS" />
+                                    <TextField maxWidth="64.0" text="0.05" />
+                                 </children>
+                              </HBox>
+                              <HBox>
+                                 <children>
+                                    <Label contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Samples" HBox.hgrow="ALWAYS" />
+                                    <TextField maxWidth="64.0" text="500" />
+                                 </children>
+                              </HBox>
+                              <HBox>
+                                 <children>
+                                    <Label contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Mean" HBox.hgrow="ALWAYS" />
+                                    <TextField maxWidth="64.0" text="0.5" />
+                                 </children>
+                              </HBox>
+                              <HBox>
+                                 <children>
+                                    <Label contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Sigma" HBox.hgrow="ALWAYS" />
+                                    <TextField maxWidth="64.0" text="0.25" />
+                                 </children>
+                              </HBox>
+                              <HBox>
+                                 <children>
+                                    <Label contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="A" HBox.hgrow="ALWAYS" />
+                                    <TextField maxWidth="64.0" text="2.1" />
+                                 </children>
+                              </HBox>
+                              <HBox>
+                                 <children>
+                                    <Label contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="B" HBox.hgrow="ALWAYS" />
+                                    <TextField maxWidth="64.0" text="2.5" />
+                                 </children>
+                              </HBox>
+                              <HBox>
+                                 <children>
+                                    <Label contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="K" HBox.hgrow="ALWAYS" />
+                                    <TextField maxWidth="64.0" text="10" />
+                                 </children>
+                              </HBox>
+                              <HBox>
+                                 <children>
+                                    <Label contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Gamma" HBox.hgrow="ALWAYS" />
+                                    <TextField maxWidth="64.0" text="1.0" />
+                                 </children>
+                              </HBox>
+                              <HBox>
+                                 <children>
+                                    <Label contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Series Count" HBox.hgrow="ALWAYS" />
+                                    <TextField maxWidth="64.0" text="512" />
+                                 </children>
+                              </HBox>
+                           </children>
+                        </VBox>
+                     </content>
+                  </TitledPane>
                   <Button fx:id="startButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onStartButton" text="Start" />
                   <Button fx:id="stopButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onStopButton" text="Stop" />
                </children>
